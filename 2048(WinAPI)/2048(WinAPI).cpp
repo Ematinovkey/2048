@@ -181,7 +181,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			else if (current.win())
 			{
 				started = false;
-
 				MessageBox(hWnd, "Game Over", "You win!", MB_OK);
 
 			}
