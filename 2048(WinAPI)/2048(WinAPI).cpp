@@ -175,7 +175,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hWnd, NULL, TRUE);
 			if (current.is_full())
 			{
-				MessageBox(hWnd, "Game Over", "You lose!", MB_OK);//add test
+				MessageBox(hWnd, "Game Over", "You lose!", MB_OK);
 				started = false;
 			}
 			else if (current.win())
