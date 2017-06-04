@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ctime>
+#include <fstream>
 
 using namespace std;
 
@@ -167,4 +168,22 @@ public:
 	{
 		return field[st_ind][col_ind];
 	}
+	void save(ofstream &savef)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+				savef << field[i][j] << " ";
+			savef << endl;
+		}
+	}
+	void load(ifstream &savef)
+	{
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				savef >> field[i][j];
+	}
+
+				
 };
+

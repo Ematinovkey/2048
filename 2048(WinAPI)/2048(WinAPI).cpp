@@ -8,13 +8,13 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-int  _x, _y;
 bool started;
-char buff[4];
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 GameAI current;
+void save();
+void load();
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -103,7 +103,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	hInst = hInstance; // Store instance handle in our global variable
 
 	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		350,50, 800, 800, nullptr, nullptr, hInstance, nullptr);
+		350,20, 800, 800, nullptr, nullptr, hInstance, nullptr);
 
 	if (!hWnd)
 	{
@@ -128,7 +128,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static HFONT numF = CreateFont(80, 40, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 0, 0, "Clear Sans");
+	static HFONT numF = CreateFont(76, 38, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 0, 0, "Clear Sans");
 	switch (message)
 	{
 	case WM_COMMAND:
@@ -142,6 +142,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case ID_MENU_NEWGAME:
 			current.generateNew();
+			started = true;
+			InvalidateRect(hWnd, NULL, TRUE);
+			break;
+		case ID_MENU_SAVE:
+			save();
+			InvalidateRect(hWnd, NULL, TRUE);
+			break;
+		case ID_MENU_LOADLASTSAVE:
+			load();
 			started = true;
 			InvalidateRect(hWnd, NULL, TRUE);
 			break;
@@ -175,13 +184,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hWnd, NULL, TRUE);
 			if (current.is_full())
 			{
-				MessageBox(hWnd, "Game Over", "You lose!", MB_OK);
+				MessageBox(hWnd, "You lose!", "Game over", MB_OK);
 				started = false;
 			}
 			else if (current.win())
 			{
 				started = false;
-				MessageBox(hWnd, "Game Over", "You win!", MB_OK);
+				MessageBox(hWnd, "You win!", "Congrats!", MB_OK);
 
 			}
 
@@ -196,7 +205,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT ps;
 		RECT rc, tile;
 		GetClientRect(hWnd, &rc);
-		_x = rc.right / 4, _y = rc.bottom / 4;
+		int _x = rc.right / 4, _y = rc.bottom / 4;
 		char buff[5];
 		HDC hdc, hdcMem;
 		HBITMAP hbmMem;
@@ -217,7 +226,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				switch (val)
 				{
 				case 0:
-					SelectObject(hdcMem, GetStockObject(WHITE_BRUSH));
+					SelectObject(hdcMem, CreateSolidBrush(RGB(205,193,180)));
 					break;
 				case 2:
 					SelectObject(hdcMem, CreateSolidBrush(RGB(238, 228, 218)));
@@ -258,7 +267,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					SelectObject(hdcMem, CreateSolidBrush(RGB(60, 58, 50)));
 					break;
 				}
-				SelectObject(hdcMem, GetStockObject(WHITE_PEN));
+				SelectObject(hdcMem, CreatePen(1,22,RGB(187,173,160)));
 				Rectangle(hdcMem, i*_x, j*_y, (i + 1)*_x, (j + 1)*_y);
 				_itoa(val, buff, 10);
 				if(val)
@@ -316,4 +325,19 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return (INT_PTR)FALSE;
+}
+
+void save()
+{
+	ofstream s;
+	s.open("save.txt");
+	current.save(s);
+	s.close();
+}
+
+void load()
+{
+	ifstream s;
+	s.open("save.txt");
+	current.load(s);
 }
